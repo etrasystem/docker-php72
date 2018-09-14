@@ -58,7 +58,7 @@ RUN CFLAGS="-fPIC" && OPENSSL_VERSION="1.0.2d" \
       && ./config -fPIC && make && make install \
       && rm -rf /tmp/*
 
-ENV PHP_VERSION 5.3.29
+ENV PHP_VERSION 7.2.10
 
 # php 5.3 needs older autoconf
 # --enable-mysqlnd is included below because it's harder to compile after the fact the extensions are (since it's a plugin for several extensions, not an extension in itself)
@@ -113,6 +113,7 @@ RUN echo "default_charset = " > $PHP_INI_DIR/php.ini \
 COPY docker-php-* /usr/local/bin/
 COPY apache2-foreground /usr/local/bin/
 
+COPY info.php  /var/www/html
 WORKDIR /var/www/html
 
 EXPOSE 80
