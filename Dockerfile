@@ -1,5 +1,5 @@
 FROM debian:jessie
-MAINTAINER https://github.com/cristianorsolin/docker-php-5.3-apache
+MAINTAINER https://github.com/etrasystem/docker-php72
 
 # persistent / runtime deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -37,7 +37,7 @@ RUN mv /etc/apache2/apache2.conf /etc/apache2/apache2.conf.dist
 COPY apache2.conf /etc/apache2/apache2.conf
 ##</apache2>##
 
-ENV PHP_INI_DIR /etc/php5/apache2
+ENV PHP_INI_DIR /usr/local/etc/php
 RUN mkdir -p $PHP_INI_DIR/conf.d
 
 # ENV GPG_KEYS 0B96609E270F565C13292B24C13C70B87267B52D 0A95E9A026542D53835E3F3A7DEC4E69FC9C83D7 0E604491
@@ -101,17 +101,22 @@ RUN buildDeps=" \
             --with-readline \
             --with-recode \
             --with-zlib \
+            --with-zib \
       && make -j"$(nproc)" \
       && make install \
       && { find /usr/local/bin /usr/local/sbin -type f -executable -exec strip --strip-all '{}' + || true; } \
       && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false $buildDeps \
       && make clean
 
+
 RUN echo "default_charset = " > $PHP_INI_DIR/php.ini \
     && echo "date.timezone = Asia/Seoul" >> $PHP_INI_DIR/php.ini
 
 COPY docker-php-* /usr/local/bin/
+RUN docker-php-ext-install zip
+
 COPY apache2-foreground /usr/local/bin/
+
 
 COPY info.php  /var/www/html
 WORKDIR /var/www/html
